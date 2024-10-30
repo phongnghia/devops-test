@@ -13,12 +13,17 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'echo "Build devops-test image - v$BUILD_NUMBER"'
-                sh 'docker build -t devops-test:v$BUILD_NUMBER /var/jenkins_home/workspace/devops-test'
+                sh 'docker build -t phongnghia/devops-test:v$BUILD_NUMBER /var/jenkins_home/workspace/devops-test'
             }
         }
         stage('Validation') {
             steps {
-                sh 'docker run -d --entrypoint bash devops-test:v$BUILD_NUMBER -c "bash run.sh" -p 3000:3000'
+                sh 'docker run -d --entrypoint bash phongnghia/devops-test:v$BUILD_NUMBER -c "bash run.sh" -p 3000:3000'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker push phongnghia/devops-test:v$BUILD_NUMBER'
             }
         }
     }
