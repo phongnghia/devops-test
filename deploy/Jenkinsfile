@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Validation') {
             steps {
-                sh 'docker run -d --entrypoint bash phongnghia/devops-test:v$BUILD_NUMBER -c "bash run.sh" -p 3000:3000'
+                sh 'docker compose up'
             }
         }
         stage('Deploy') {

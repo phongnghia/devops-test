@@ -1,0 +1,72 @@
+---
+
+- name: Check if {{ volume_folder }} exists
+  stat:
+    path: "{{ volume_folder }}"
+  register: check_volume_folder
+
+- name: Create {{ volume_folder }} directory if not exists
+  become: true
+  become_user: "{{ username }}"
+  file:
+    path: "{{ volume_folder }}"
+    state: directory
+    mode: 0750
+  when: check_volume_folder.stat.exists is defined and not check_volume_folder.stat.exists
+
+- name: Create docker network
+  shell: docker network create jenkins
+  register: create_jenkins_network
+  changed_when: create_jenkins_network.rc != 0
+
+- name: Run docker host
+  shell: |
+    docker run --name jenkins-docker --rm --detach \
+    --privileged --network jenkins --network-alias docker \
+    --env DOCKER_TLS_CERTDIR=/certs \
+    --volume {{ jenkins_docker_certs }}:/certs/client \
+    --volume {{ jenkins_data }}:/var/jenkins_home \
+    --publish 2376:2376 \
+    docker:dind
+  register: docker_host
+  failed_when: false
+  changed_when: docker_host.rc != 0
+
+- fail:
+    msg: "Failed when run docker host"
+  when: docker_host.rc is defined and docker_host.rc != 0
+
+- name: Create Dockerfile
+  template:
+    src: Dockerfile_template
+    dest: "{{ volume_folder }}/Dockerfile"
+
+- name: Build customize jenkins image
+  shell: |
+    docker build -t {{ image_name }}:{{ image_verion }} {{ volume_folder }}/Dockerfile
+  register: build_jenkins_image
+  failed_when: false
+  changed_when: build_jenkins_image.rc != 0
+
+- fail:
+    msg: "Failed when build customize Jenkins image"
+  when: build_jenkins_image.rc is defined and build_jenkins_image.rc != 0
+
+- name: Run customize Jenkins container
+  shell: |
+    docker run -u root \
+    --name devops-test \
+    --restart=on-failure \
+    --detach \
+    --network jenkins \
+    --env DOCKER_HOST=tcp://docker:2376 \
+    --env DOCKER_CERT_PATH=/certs/client \
+    --env DOCKER_TLS_VERIFY=1 \
+    --publish 443:8443 \
+    --publish 50000:50000 \
+    --volume {{ jenkins_data }}:/var/jenkins_home \
+    --volume {{ jenkins_docker_certs }}:/certs/client:ro \
+    {{ image_name }}:{{ image_verion }}   --httpPort=-1 --httpsPort=8443 --httpsKeyStore=/var/lib/jenkins/jenkinsserver.jks --httpsKeyStorePassword=password
+  register: container_jenkins
+  failed_when: false
+  changed_when: container_jenkins.rc != 0
