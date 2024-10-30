@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout'){
+            steps {
+                checkout scmGit(branches: [[name: '*/devops-test']],
+                browser: github('https://github.com/phongnghia/devops-test.git'),
+                extensions: [],
+                userRemoteConfigs: [[url: 'https://github.com/phongnghia/devops-test.git']])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'echo "Build devops-test image - v$BUILD_NUMBER"'
+                sh 'docker build -t devops-test:v$BUILD_NUMBER /var/jenkins_home/workspace/devops-test'
+            }
+        }
+        stage('Validation') {
+            steps {
+                sh 'docker run -d --entrypoint bash devops-test:v$BUILD_NUMBER -c "bash run.sh" -p 3000:3000'
+            }
+        }
+    }
+}
