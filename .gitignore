@@ -1,6 +1,4 @@
 .pytest_cache
-.env*
-!.env.example
 .venv
 __pycache__
 docker
