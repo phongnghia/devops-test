@@ -11,11 +11,11 @@
       changed_when: pull_image.rc != 0
 
     - name: Run Container
-      shell: docker run --name devops-test-container -d {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest
+      shell: docker run --name devops-test -d --entrypoint bash {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest ./run.sh
       register: run_test_container
 
     - name: Check if container is running
-      shell: "docker inspect -f \"{{.State.Running}}\" {{ run_test_container.stdout }}"
+      shell: docker inspect -f '{{ "{{ .State.Running }}" }}' {{ run_test_container.stdout }}
       register: container_is_running
 
     - name: Fail if container did not start
