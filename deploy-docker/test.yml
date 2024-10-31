@@ -1,6 +1,12 @@
 - name: Test devops-test Image
   hosts: localhost
   tasks:
+    - name: Pull devops-test image
+      shell: docker pull {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest
+      register: pull_image
+      failed_when: false
+      changed_when: pull_image.rc != 0
+
     - name: Run Container
       shell: docker run --name devops-test-container -d {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest
       register: run_test_container
