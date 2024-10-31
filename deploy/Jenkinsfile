@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'apt-get update; apt-get install ansible'
+                sh 'apt-get update; apt-get -y install ansible'
                 sh 'echo $DOCKERHUB_TOKEN > token.txt 2>/dev/null'
                 sh 'ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
             }
