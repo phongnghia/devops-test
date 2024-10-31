@@ -71,7 +71,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ IMAGE_TAG }}
+          tags: ${{ env.IMAGE_TAG }}
 
   test:
     runs-on: ubuntu-latest
