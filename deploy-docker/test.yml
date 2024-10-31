@@ -23,6 +23,16 @@
         msg: "Container failed to start"
       when: container_is_running.stdout != "true"
 
+    - name: Add pytest
+      shell: docker exec {{ run_test_container.stdout }} poetry add --dev pytest
+      register: add_pytest
+      failed_when: false
+      changed_when: add_pytest.rc != 0
+
+    - fail:
+        msg: "{{ add_pytest.stderr_lines }}"
+      when: add_pytest.rc is defined and add_pytest.rc != 0
+
     - name: Run tests
       shell: docker exec {{ run_test_container.stdout }} poetry run pytest -s
       register: test_execute_result
@@ -35,3 +45,9 @@
       fail:
         msg: "Tests failed."
       when: test_execute_result.rc != 0
+
+    - name: Test Passed
+      debug:
+        msg: |
+          Test Passed:
+          {{ test_execute_result.stdout_lines }}
