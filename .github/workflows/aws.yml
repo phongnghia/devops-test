@@ -18,6 +18,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
   AWS_ECS_PROFILE_NAME: ${{ env.AWS_ECS_PROFILE_NAME }}
   CONTAINER_NAME: devops-test 
+
 permissions:
   contents: read
 
@@ -41,10 +42,9 @@ jobs:
       - name: Replace inventory hosts file
         run: |
           export INVENTORY_HOSTS_FILE="deploy-aws/inventory/hosts.yml"
-          sed -i "s#localhost#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
+          sed -i "s#__REMOTE_IP__#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__REMOTE_USERNAME__#$REMOTE_USERNAME#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__REMOTE_PASSWORD__#$REMOTE_PASSWORD#g" $INVENTORY_HOSTS_FILE 2>/dev/null
-          sed -i "s#__REMOTE_IP__#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__ECR_REPOSITORY_REGISTRY__#$ECR_REPOSITORY_REGISTRY#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__AWS_REGION__#$AWS_REGION#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__AWS_ACCESS_KEY__#$AWS_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE 2>/dev/null
