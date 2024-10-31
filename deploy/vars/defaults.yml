@@ -1,0 +1,11 @@
+jenkins_image: "jenkins/jenkins:latest"
+image_name: "{{ app_image_registry | default('phongnghia') }}/devops-test"
+image_verion: "latest"
+https_port: "8443"
+
+volume_folder: "/root/jenkins"
+jenkins_docker_certs: "{{ volume_folder }}/jenkins-docker-certs"
+jenkins_data: "{{ volume_folder }}/jenkins-data"
+
+# for kubernetes
+google_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"

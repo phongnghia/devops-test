@@ -1,0 +1,47 @@
+---
+
+- name: Create {{ deployment_cicd_dir }} if not exists
+  file:
+    path: "{{ deployment_cicd_dir }}"
+    state: directory
+    owner: "{{ username | default(ansible_user) }}"
+    group: "{{ username | default(ansible_user) }}"
+    mode: 0755
+
+- name: Configure ecs-cli profile
+  shell: ecs-cli configure profile --profile-name {{ ecs_profile_name }} --access-key {{ access_key_id }} --secret-key {{ secret_access_key }}
+  register: configure_profile
+  failed_when: false
+  changed_when: configure_profile.rc != 0
+
+- name: Check cluster name exists
+  shell: |
+    ecs-cli describe --cluster {{ cluster_name }}
+  register: check_ecs_cluster
+  failed_when: false
+  changed_when: check_ecs_cluster.rc != 0
+
+- name: Create ECS cluster
+  shell: |
+    ecs-cli up --cluster-config {{ cluster_name }} --launch-type FARGATE
+  register: create_ecs_cluster
+  failed_when: false
+  changed_when: create_ecs_cluster.rc != 0
+  when: check_ecs_cluster is defined and check_ecs_cluster.rc != 0
+
+- fail:
+    msg: |
+      Failed when creating ECS cluster
+      {{ create_ecs_cluster }}
+  when: create_ecs_cluster is defined and (create_ecs_cluster.rc is defined and create_ecs_cluster.rc != 0)
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: "{{ deployment_cicd_dir }}/docker-compose.yml"
+
+- name: Deployment devops-test application
+  shell: ecs-cli compose --file {{ deployment_cicd_dir }}/docker-compose.yml service up --cluster-config {{ cluster_name }}
+
+
+

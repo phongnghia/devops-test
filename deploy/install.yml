@@ -1,0 +1,21 @@
+- name: Deployment pipeline
+  hosts: all
+  become: true
+  vars_files:
+    - vars/defaults.yml
+
+  tasks:
+    - name: Pre-install docker
+      apt:
+        update_cache: true
+      changed_when: false
+      tags: pre-install
+
+    - name: Get public ip
+      include_tasks: get-public-ip.yml
+      when: public_ip is undefined or public_ip | length == 0
+
+    - name: Deployment pipeline
+      import_role:
+        name: deployment-pipeline
+      tags: deployment_pipeline

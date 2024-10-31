@@ -1,0 +1,6 @@
+---
+
+- name: Install Docker
+  include_tasks: docker.yml
+  tags: install-docker
+
