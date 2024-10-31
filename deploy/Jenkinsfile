@@ -12,22 +12,18 @@ pipeline {
         }
         stage('Build') {
             steps {
-                //sh 'dpkg --configure -a;apt-get install -f'
-                //sh 'apt-get update;apt-get install -y python3'
-                //sh 'python3 -m pip install --upgrade pip; pip3 install ansible boto3'
                 sh 'cp /var/lib/jenkins/token.txt .'
-                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
-                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage,login_docker_tag" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
             }
         }
         stage('Validation') {
             steps {
-                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/test.yml'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,build_stage"'
             }
         }
     }
