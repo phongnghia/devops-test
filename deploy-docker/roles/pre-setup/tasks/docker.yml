@@ -48,6 +48,9 @@
 
 - name: Add user to docker group
   command: usermod -aG docker $USER
+  register: add_docker_group
+  failed_when: false
+  changed_when: add_docker_group.rc != 0
 
 - name: Config docker service
   lineinfile:

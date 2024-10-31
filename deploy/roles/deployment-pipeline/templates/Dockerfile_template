@@ -3,7 +3,8 @@ USER root
 RUN apt-get update && apt-get install ca-certificates curl && install -m 0755 -d /etc/apt/keyrings
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && chmod a+r /etc/apt/keyrings/docker.asc
 RUN echo   "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu   jammy stable" |   tee /etc/apt/sources.list.d/docker.list
-RUN apt-get update && apt-get install -y docker-ce-cli
+RUN apt-get update && apt-get install -y docker-ce-cli ansible
 RUN mkdir /var/lib/jenkins && chown jenkins:jenkins -R /var/lib/jenkins
 COPY jenkinsserver.jks /var/lib/jenkins
-USER jenkins
+COPY token.txt /var/lib/jenkins
+USER jenkin

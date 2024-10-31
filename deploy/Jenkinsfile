@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout'){
             steps {
-                checkout scmGit(branches: [[name: '*/devops-test']],
+                checkout scmGit(branches: [[name: '*/main']],
                 browser: github('https://github.com/phongnghia/devops-test.git'),
                 extensions: [],
                 userRemoteConfigs: [[url: 'https://github.com/phongnghia/devops-test.git']])
@@ -12,9 +12,11 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'apt-get update; apt install -y python3'
-                sh 'python3 -m pip install --upgrade pip; pip3 install ansible boto3'
-                sh 'echo $DOCKERHUB_TOKEN > token.txt 2>/dev/null'
+                //sh 'dpkg --configure -a;apt-get install -f'
+                //sh 'apt-get update;apt-get install -y python3'
+                //sh 'python3 -m pip install --upgrade pip; pip3 install ansible boto3'
+                sh 'cp /var/lib/jenkins/token.txt .'
+                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
                 sh 'ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
             }
         }
