@@ -1,0 +1,13 @@
+home_directory: "{{ playbook_dir }}/../"
+deployment_cicd_dir: "{{ ansible_user_dir }}/deployment-cicd"
+#proxy_env:
+#  http_proxy: "http://x.x.x.x:8080"
+#  https_proxy: "http://x.x.x.x:8080"
+
+google_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+cri_docker_version: "0.3.8"
+ecr_repository_name: "devops-test"
+ecr_repository_registry: "phongnghia"
+
+#ssh-keygen -R <IP>
+#ssh-keyscan <IP> 2> -t ssh-ed25519 /dev/null >> /$HOME/.ssh/known_hosts

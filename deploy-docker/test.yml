@@ -1,0 +1,28 @@
+- name: Test devops-test Image
+  hosts: localhost
+  tasks:
+    - name: Run Container
+      shell: docker run --name devops-test-container -d {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest
+      register: run_test_container
+
+    - name: Check if container is running
+      shell: docker inspect -f '{{.State.Running}}' {{ run_test_container.stdout }}
+      register: container_is_running
+
+    - name: Fail if container did not start
+      fail:
+        msg: "Container failed to start"
+      when: container_is_running.stdout != "true"
+
+    - name: Run tests
+      shell: docker exec {{ run_test_container.stdout }} poetry run pytest -s
+      register: test_execute_result
+
+    - name: Remove container
+      shell: docker rm -f {{ run_test_container.stdout }}
+      when: test_execute_result is defined
+
+    - name: Fail if Tests Failed
+      fail:
+        msg: "Tests failed."
+      when: test_execute_result.rc != 0

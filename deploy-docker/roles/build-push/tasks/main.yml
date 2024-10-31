@@ -1,0 +1,6 @@
+---
+- name: Build Docker image
+  shell: "docker build -t {{ ecr_repository_name }}:latest  {{ home_directory }}"
+
+- name: Tag Docker image
+  shell: "docker tag {{ ecr_repository_name }}:latest {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest"
