@@ -1,0 +1,107 @@
+---
+
+- name: Install docker
+  include_tasks: docker.yml
+  tags: install_docker
+
+- name: Remove {{ deployment_cicd_dir }}
+  file:
+    path: "{{ deployment_cicd_dir }}"
+    state: absent
+
+- name: Create {{ deployment_cicd_dir }} if not exists
+  file:
+    path: "{{ deployment_cicd_dir }}"
+    state: directory
+    owner: "{{ username | default(ansible_user) }}"
+    group: "{{ username | default(ansible_user) }}"
+    mode: 0755
+
+- name: Check ansible is installed
+  shell: ansible --version
+  register: ansible_version
+  failed_when: false
+  changed_when: ansible_version.rc != 0
+
+- name: Check archive awscli file exists
+  stat:
+    path: "{{ deployment_cicd_dir }}/awscliv2.zip"
+  register: awscli_exists
+
+- name: Download awscli if not exists
+  get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    dest: "{{ deployment_cicd_dir }}/awscliv2.zip"
+    owner: "{{ username | default(ansible_user) }}"
+    group: "{{ username | default(ansible_user) }}"
+    validate_certs: false
+  register: download_awscli
+  changed_when: download_awscli.failed | bool
+  when: awscli_exists.stat is defined and not awscli_exists.stat.exists
+
+- fail:
+    msg: "Failed to download awscli package file"
+  when: download_awscli is defined and download_awscli.failed | bool
+
+- name: Extract awscli package
+  unarchive:
+    src: "{{ deployment_cicd_dir }}/awscliv2.zip"
+    dest: "{{ deployment_cicd_dir }}"
+    remote_src: true
+    mode: '0755'
+    owner: "{{ username | default(ansible_user) }}"
+    group: "{{ username | default(ansible_user) }}"
+
+- name: Install awscli
+  shell:
+    cmd: "./aws/install"
+    chdir: "{{ deployment_cicd_dir }}"
+  register: install_awscli
+  failed_when: false
+  changed_when: install_awscli.rc != 0
+
+- fail:
+    msg: "Failed to install awscli package"
+  when: install_awscli is defined and install_awscli.rc != 0
+
+- name: Download ecs-cli
+  get_url:
+    url: "https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest"
+    dest: "/usr/local/bin/ecs-cli"
+    mode: 0755
+    validate_certs: false
+  register: download_ecs_cli
+  changed_when: download_ecs_cli.failed | bool
+
+
+#- name: Update apt cache
+#  apt:
+#    name: aptitude
+#    state: latest
+#    update_cache: true
+#    force_apt_get: true
+#
+#- name: Install ansible if not exists
+#  package:
+#    name: ansible
+#    state: latest
+#  register: install_ansible
+#  failed_when: false
+#  changed_when: install_ansible.failed | bool
+#
+#- fail:
+#    msg: "Failed when installing ansible package"
+#  when: install_ansible is defined and install_ansible.failed | bool | default(False)
+
+- debug:
+    msg: "Required packages installed successfully"
+
+- name: Configure AWS CLI
+  shell: |
+    aws configure set aws_access_key_id '{{ your_access_key_id }}'
+    aws configure set aws_secret_access_key '{{ your_secret_access_key }}'
+    aws configure set region '{{ aws_region }}'
+    aws configure set output 'json'
+  register: configure_aws_cli
+  failed_when: false
+  changed_when: configure_aws_cli.rc != 0

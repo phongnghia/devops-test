@@ -1,0 +1,22 @@
+- name: Setup CI/CD server
+  hosts: all
+  become: true
+  vars_files:
+    - vars/defaults.yml
+  environment: "{{ proxy_env | default('') }}"
+
+  tasks:
+    - name: Pre-setup
+      include_role:
+        name: pre-setup
+      tags: pre_setup_stage
+
+    - name: Build and push
+      include_role:
+        name: build-push
+      tags: build_stage
+
+    - name: Deployment
+      include_role:
+        name: deployment
+      tags: deployment_stage
