@@ -16,11 +16,18 @@
     update_cache: true
     force_apt_get: true
 
+- name: Check docker version
+  shell: docker version
+  register: check_docker_version
+  failed_when: false
+  changed_when: check_docker_version.rc != 0
+
 - name: Install docker.io
   package:
     name: docker.io
     state: latest
   ignore_errors: true
+  when: check_docker_version is undefine or check_docker_version.rc != 0
 
 - name: Create {{ deployment_cicd_dir }}
   file:
