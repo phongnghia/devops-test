@@ -4,8 +4,6 @@
   file:
     path: "{{ deployment_cicd_dir }}"
     state: directory
-    owner: "{{ username | default(ansible_user) }}"
-    group: "{{ username | default(ansible_user) }}"
     mode: 0755
 
 - name: Copy docker-compose.yml
