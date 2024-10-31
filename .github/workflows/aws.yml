@@ -36,7 +36,7 @@ jobs:
       - name: Install Ansible
         run: |
           python -m pip install --upgrade pip
-          pip install ansible boto3 docker-ce docker-ce-cli
+          pip install ansible boto3
 
 #      - name: Replace inventory hosts file
 #        run: |
@@ -50,11 +50,10 @@ jobs:
 #          sed -i "s#__AWS_SECRET_ACCESS_KEY__#$AWS_SECRET_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE 2>/dev/null
 #          sed -i "s#__AWS_CLUSTER_NAME__#$ECS_CLUSTER#g" $INVENTORY_HOSTS_FILE
 #          sed -i "s#__AWS_ECS_PROFILE_NAME__#$AWS_ECS_PROFILE_NAME#g" $INVENTORY_HOSTS_FILE
-#
-#      - name: Run pre-setup for CI/CD node
-#        run: |
-#          ansible-playbook -i deploy-aws/inventory/hosts.yml deploy-aws/install.yml \
-#          --skip-tags "build_stage,deployment_stage"
+
+      - name: Run pre-setup for CI/CD node
+        run: |
+          ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"
 
       - name: Run Build Stage
         run: |
