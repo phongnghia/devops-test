@@ -64,7 +64,8 @@ jobs:
 
       - name: Run Build Stage
         run: |
-          ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage"
+          ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" \
+          --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}"
 
 #      - name: Build and push
 #        uses: docker/build-push-action@v6
