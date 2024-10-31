@@ -15,7 +15,7 @@
       register: run_test_container
 
     - name: Check if container is running
-      shell: docker inspect -f '{{.State.Running}}' {{ run_test_container.stdout }}
+      shell: "docker inspect -f '{{.State.Running}}' {{ run_test_container.stdout }}"
       register: container_is_running
 
     - name: Fail if container did not start
