@@ -64,6 +64,7 @@ jobs:
 
       - name: Run Build Stage
         run: |
+          echo ${{ secrets.DOCKERHUB_TOKEN }} > token.txt 2>/dev/null
           ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" \
           --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}"
 

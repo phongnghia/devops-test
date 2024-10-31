@@ -7,11 +7,11 @@
 
 - name: Check file exists
   stat:
-    path: "{{ home_directory }}/token"
+    path: "{{ home_directory }}/token.txt"
   register: store_file
 
 - name: Get token
-  shell: "cat {{ home_directory }}/token"
+  shell: "cat {{ home_directory }}/token.txt"
   register: token
   when: store_file.stat is defined and store_file.stat.exists
 
