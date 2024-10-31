@@ -1,5 +1,8 @@
 - name: Test devops-test Image
   hosts: localhost
+  become: true
+  vars_files:
+    - vars/defaults.yml
   tasks:
     - name: Pull devops-test image
       shell: docker pull {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest

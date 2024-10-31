@@ -9,6 +9,13 @@
 #    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
 #    state: present
 
+- name: Update apt cache
+  apt:
+    name: aptitude
+    state: latest
+    update_cache: true
+    force_apt_get: true
+
 - name: Install docker.io
   package:
     name: docker.io
