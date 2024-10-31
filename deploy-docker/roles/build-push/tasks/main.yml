@@ -21,6 +21,7 @@
   failed_when: false
   changed_when: login_docker.rc != 0
   no_log: true
+  tags: login_docker_tag
 
 - name: Push Docker image
   shell: "docker push {{ ecr_repository_registry }}/{{ ecr_repository_name }}:latest"

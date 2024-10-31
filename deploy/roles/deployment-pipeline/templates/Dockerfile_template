@@ -1,10 +1,30 @@
-FROM {{ jenkins_image }}
+FROM jenkins/jenkins:latest
+
 USER root
-RUN apt-get update && apt-get install ca-certificates curl && install -m 0755 -d /etc/apt/keyrings
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && chmod a+r /etc/apt/keyrings/docker.asc
-RUN echo   "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu   jammy stable" |   tee /etc/apt/sources.list.d/docker.list
-RUN apt-get update && apt-get install -y docker-ce-cli ansible
-RUN mkdir /var/lib/jenkins && chown jenkins:jenkins -R /var/lib/jenkins
+
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        ca-certificates \
+        curl \
+        python3 \
+        python3-venv && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install ansible
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable" | tee /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/lib/jenkins && \
+    chown jenkins:jenkins -R /var/lib/jenkins
+
 COPY jenkinsserver.jks /var/lib/jenkins
 COPY token.txt /var/lib/jenkins
-USER jenkin
+
+USER jenkins
