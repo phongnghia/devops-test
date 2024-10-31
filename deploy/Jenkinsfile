@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'python -m pip install --upgrade pip; pip install ansible boto3'
+                sh 'apt-get install python3; python3 -m pip install --upgrade pip; pip3 install ansible boto3'
                 sh 'echo $DOCKERHUB_TOKEN > token.txt 2>/dev/null'
                 sh 'ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
             }
