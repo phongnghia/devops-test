@@ -36,6 +36,7 @@ jobs:
 
       - name: Replace inventory hosts file
         run: |
+          echo $PUBLIC_IP
           export INVENTORY_HOSTS_FILE="deploy-aws/inventory/hosts.yml"
           sed -i "s#localhost#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__REMOTE_USERNAME__#$REMOTE_USERNAME#g" $INVENTORY_HOSTS_FILE
