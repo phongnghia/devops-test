@@ -12,18 +12,19 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'echo "Build devops-test image - v$BUILD_NUMBER"'
-                sh 'docker build -t phongnghia/devops-test:v$BUILD_NUMBER /var/jenkins_home/workspace/devops-test'
+                sh 'apt-get update; apt-get install ansible'
+                sh 'echo $DOCKERHUB_TOKEN > token.txt 2>/dev/null'
+                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
             }
         }
         stage('Validation') {
             steps {
-                sh 'docker compose up'
+                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'docker push phongnghia/devops-test:v$BUILD_NUMBER'
+                sh 'ansible-playbook deploy-docker/install.yml --skip-tags "build_stage,deployment_stage"'
             }
         }
     }
