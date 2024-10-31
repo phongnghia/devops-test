@@ -5,7 +5,7 @@ on:
     branches: [ "devops-test" ]
 
 env:
-  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
   ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
   ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
@@ -39,12 +39,12 @@ jobs:
           export INVENTORY_HOSTS_FILE="deploy-aws/inventory/hosts.yml"
           sed -i "s#localhost#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__REMOTE_USERNAME__#$REMOTE_USERNAME#g" $INVENTORY_HOSTS_FILE
-          sed -i "s#__REMOTE_PASSWORD__#$REMOTE_PASSWORD#g" $INVENTORY_HOSTS_FILE
+          sed -i "s#__REMOTE_PASSWORD__#$REMOTE_PASSWORD#g" $INVENTORY_HOSTS_FILE 2>/dev/null
           sed -i "s#__REMOTE_IP__#$PUBLIC_IP#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__ECR_REPOSITORY_REGISTRY__#$ECR_REPOSITORY_REGISTRY#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__AWS_REGION__#$AWS_REGION#g" $INVENTORY_HOSTS_FILE
-          sed -i "s#__AWS_ACCESS_KEY__#$AWS_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE
-          sed -i "s#__AWS_SECRET_ACCESS_KEY__#$AWS_SECRET_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE
+          sed -i "s#__AWS_ACCESS_KEY__#$AWS_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE 2>/dev/null
+          sed -i "s#__AWS_SECRET_ACCESS_KEY__#$AWS_SECRET_ACCESS_KEY#g" $INVENTORY_HOSTS_FILE 2>/dev/null
           sed -i "s#__AWS_CLUSTER_NAME__#$ECS_CLUSTER#g" $INVENTORY_HOSTS_FILE
           sed -i "s#__AWS_ECS_PROFILE_NAME__#$AWS_ECS_PROFILE_NAME#g" $INVENTORY_HOSTS_FILE
 
