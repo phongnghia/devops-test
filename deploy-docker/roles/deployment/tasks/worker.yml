@@ -1,0 +1,38 @@
+---
+- name: SSH keygen
+  shell: ssh-keygen -R {{ ansible_ssh_host }}
+  register: ssh_key_gen
+  failed_when: false
+  changed_when: ssh_key_gen.rc != 0
+  delegate_to: "{{ item }}"
+
+- name: SSH key-scan
+  become: true
+  shell: ssh-keyscan {{ ansible_ssh_host }} 2> /dev/null >> ~/.ssh/known_hosts
+  register: ssh_key_scan
+  delegate_to: "{{ item }}"
+
+- name: Copy task
+  template:
+    src: docker-compose.yml
+    dest: /root
+  delegate_to: "{{ item }}"
+  register: copy_task
+  ignore_errors: true
+
+- name: Deploy app
+  become: true
+  shell:
+    cmd: docker compose up
+    chdir: /root
+  delegate_to: "{{ item }}"
+  register: deploy_app
+  failed_when: false
+  changed_when: deploy_app.rc != 0
+
+- fail:
+    msg: "Deploy application failed"
+  when: deploy_app.rc is defined and deploy_app.rc != 0
+
+- debug:
+    msg: "Application deployed successfully"
