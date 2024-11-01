@@ -48,6 +48,20 @@ To build, push, validate and deploy a Docker image with some sensitive data we n
 
 Docker Hub credentials (username and access token) in the appropriate variables.
 
+### Created 3 deployment folders for CI/CD with docker (GitHub Actions), jenkins and ECS
+
+_Jenkins_
+
+[CI/CD with Jenkins](https://github.com/phongnghia/devops-test/tree/main/deploy)
+
+_GitHub Actions - Docker_
+
+[CI/CD with GitHub Actions - Docker](https://github.com/phongnghia/devops-test/tree/main/deploy-docker)
+
+_GitHub Actions - ECS_
+
+[CI/CD with GitHub Actions - ECS](https://github.com/phongnghia/devops-test/tree/main/deploy-aws)
+
 ### Run the Ansible playbook in GitHub workflow file: 
 
 In install.yml we have three tasks which are setup ci/ci node, build and deploy, to be able to run ansible-playbook without any problem, we should first run setup ci/cd node
