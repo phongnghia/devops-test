@@ -98,6 +98,35 @@ REMOTE_PASSWORD: Password for ssh connection (Not recommended, use shared privat
 
 [Devops-test Pipeline](https://phongnghia.io.vn/job/devops-test-pipeline)
 
+_Jenkinsfile used_
+
+    stages {
+        stage('Checkout'){
+            steps {
+                checkout scmGit(branches: [[name: '*/main']],
+                browser: github('https://github.com/phongnghia/devops-test.git'),
+                extensions: [],
+                userRemoteConfigs: [[url: 'https://github.com/phongnghia/devops-test.git']])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'cp /var/lib/jenkins/token.txt .'
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,deployment_stage,login_docker_tag" --extra-vars "dockerhub_username=$DOCKERHUB_USERNAME"'
+            }
+        }
+        stage('Validation') {
+            steps {
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/test.yml'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh '/opt/venv/bin/ansible-playbook deploy-docker/install.yml --skip-tags "pre_setup_stage,build_stage"'
+            }
+        }
+    }
+
 ### Below is the GitHub Action file process that was used
 
 _Build_
