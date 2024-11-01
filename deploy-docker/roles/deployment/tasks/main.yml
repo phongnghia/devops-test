@@ -1,5 +1,22 @@
 ---
 
+- name: Add a host alias that we reach through a tunnel
+  add_host:
+    groups: workernode_group
+    hostname: "{{ REMOTE_HOSTNAME | default('') }}"
+    ansible_ssh_host: "{{ REMOTE_IP | default('') }}"
+    ansible_ssh_user: "{{ REMOTE_USERNAME | default('') }}"
+    ansible_ssh_port: "{{ REMOTE_SSH_PORT | default('') }}"
+    ansible_ssh_pass: "{{ REMOTE_PASSWORD | default('') }}"
+    ansible_sudo_pass: "{{ REMOTE_PASSWORD | default('') }}"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  when: REMOTE_IP is defined and REMOTE_IP | length > 0
+
+- name: Tasks
+  include_tasks: worker.yml
+  loop: "{{ groups['workernode_group'] }}"
+  when: groups['workernode_group'] is defined
+
 - name: Create {{ deployment_cicd_dir }} if not exists
   file:
     path: "{{ deployment_cicd_dir }}"
