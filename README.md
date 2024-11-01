@@ -100,8 +100,6 @@ REMOTE_PASSWORD: Password for ssh connection (Not recommended, use shared privat
 
 ### Below is the GitHub Action file process that was used
 
-YAML
-
 _Build_
 
       - name: Install Ansible
