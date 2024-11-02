@@ -62,6 +62,10 @@ _GitHub Actions - ECS_
 
 [CI/CD with GitHub Actions - ECS](https://github.com/phongnghia/devops-test/tree/main/deploy-aws)
 
+_Docker repository_
+
+[Devops-test](https://hub.docker.com/r/phongnghia/devops-test)
+
 ### Run the Ansible playbook in GitHub workflow file: 
 
 In install.yml we have three tasks which are setup ci/ci node, build and deploy, to be able to run ansible-playbook without any problem, we should first run setup ci/cd node
